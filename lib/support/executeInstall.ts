@@ -1,5 +1,5 @@
 import {Success} from "@atomist/automation-client";
-import {doWithProject, ExecuteGoal} from "@atomist/sdm";
+import {doWithProject, ExecuteGoal, ProjectAwareGoalInvocation} from "@atomist/sdm";
 import {buildHelmArgs} from "./buildArgs";
 import {determineChartVersion} from "./chartData";
 import {HelmChartDetail, HelmConfiguration, HelmGoalRegistration, HelmReleaseDetails, HelmReleases} from "./interfaces";
@@ -31,6 +31,7 @@ export function helmInstallExecution(registration: HelmConfiguration & HelmGoalR
         // Get version detail
         const version = await determineChartVersion(chartDetails, gi);
 
+
         /**
          * Determine operation details
          *
@@ -38,23 +39,7 @@ export function helmInstallExecution(registration: HelmConfiguration & HelmGoalR
          * from releaseDetails.
          */
         if (operationName === "installOrUpgrade") {
-            const releases = await gi.exec(
-                "helm",
-                ["list", "--failed", "--deployed", "--output", "json"],
-            );
-
-            const releaseData: HelmReleases = JSON.parse(releases.stdout);
-            const thisRelase = releaseData.Releases.filter(r => r.Name === releaseDetails.name)[0];
-            if (thisRelase) {
-                // check if it's in a healthy state, otherwise - fail
-                if (thisRelase.Status === "FAILED") {
-                    throw new Error(`Helm release ${releaseDetails.name} is in a failed state, cannot upgrade!`);
-                }
-                operationName = "upgrade";
-            } else {
-                operationName = "install";
-            }
-
+            operationName = await determineHelmOperation(operationName, gi, releaseDetails) as "install" | "upgrade";
         }
 
         // Get Arguments
@@ -122,4 +107,43 @@ export function helmInstallExecution(registration: HelmConfiguration & HelmGoalR
 
         return Success;
     });
+}
+
+/**
+ * Determine operation details
+ *
+ * If operation has been set to installOrUpgrade we need to determine if there is already a release present with the same name
+ * from releaseDetails.
+ */
+export async function determineHelmOperation(
+    operationName: HelmGoalRegistration["operation"],
+    gi: ProjectAwareGoalInvocation,
+    releaseDetails: HelmReleaseDetails,
+): Promise<HelmGoalRegistration["operation"]> {
+    let finalOperation: HelmGoalRegistration["operation"];
+    if (operationName === "installOrUpgrade") {
+        const releases = await gi.exec(
+            "helm",
+            ["list", "--failed", "--deployed", "--output", "json"],
+        );
+
+        const releaseData: HelmReleases = JSON.parse(releases.stdout);
+        const thisRelase = releaseData.Releases.filter(r => r.Name === releaseDetails.name)[0];
+        if (thisRelase) {
+            // check if it's in a healthy state, otherwise - fail
+            if (thisRelase.Status === "FAILED") {
+                throw new Error(`Helm release ${releaseDetails.name} is in a failed state, cannot upgrade!`);
+            }
+            finalOperation = "upgrade";
+        } else {
+            finalOperation = "install";
+        }
+
+    }
+
+    if (!finalOperation) {
+        throw new Error(`Could not determine operation type for helm install command!`);
+    }
+
+    return finalOperation;
 }
