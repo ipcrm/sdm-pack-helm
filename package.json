@@ -23,16 +23,22 @@
   ],
   "main": "./index.js",
   "types": "./index.d.ts",
-  "dependencies": {},
+  "dependencies": {
+    "@types/request-promise-native": "^1.0.17",
+    "dateformat": "^3.0.3",
+    "fs-extra": "^8.1.0",
+    "js-yaml": "^3.13.1",
+    "request-promise-native": "^1.0.7"
+  },
   "peerDependencies": {
     "@atomist/automation-client": "^1.7.0",
     "@atomist/sdm": "^1.7.0",
     "@atomist/sdm-core": "^1.7.0"
   },
   "devDependencies": {
-    "@atomist/automation-client": "^1.7.0",
-    "@atomist/sdm": "^1.7.0",
-    "@atomist/sdm-core": "^1.7.0",
+    "@atomist/automation-client": "^1.8.0-master.20191011175049",
+    "@atomist/sdm": "^1.8.0-master.20191011130951",
+    "@atomist/sdm-core": "^1.8.0-master.20191009161512",
     "@types/mocha": "^5.2.7",
     "@types/power-assert": "^1.5.0",
     "espower-typescript": "^9.0.2",
