@@ -31,7 +31,6 @@ export function helmInstallExecution(registration: HelmConfiguration & HelmGoalR
         // Get version detail
         const version = await determineChartVersion(chartDetails, gi);
 
-
         /**
          * Determine operation details
          *
