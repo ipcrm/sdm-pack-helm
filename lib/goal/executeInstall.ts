@@ -1,8 +1,8 @@
 import {Success} from "@atomist/automation-client";
 import {doWithProject, ExecuteGoal, ProjectAwareGoalInvocation} from "@atomist/sdm";
-import {buildHelmArgs} from "./buildArgs";
-import {determineChartVersion} from "./chartData";
-import {HelmChartDetail, HelmConfiguration, HelmGoalRegistration, HelmReleaseDetails, HelmReleases} from "./interfaces";
+import {buildHelmArgs} from "../support/buildArgs";
+import {determineChartVersion} from "../support/chartData";
+import {HelmChartDetail, HelmConfiguration, HelmGoalRegistration, HelmReleaseDetails, HelmReleases} from "../support/interfaces";
 
 export function helmInstallExecution(registration: HelmConfiguration & HelmGoalRegistration): ExecuteGoal {
     return doWithProject(async gi => {

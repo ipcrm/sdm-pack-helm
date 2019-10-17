@@ -8,8 +8,8 @@ import {
     Implementation,
     IndependentOfEnvironment,
 } from "@atomist/sdm";
-import {helmInstallExecution} from "../support/executeInstall";
 import {HelmConfiguration, HelmGoalRegistration} from "../support/interfaces";
+import {helmInstallExecution} from "./executeInstall";
 
 const HelmDeployGoalDefinition: GoalDefinition = {
     displayName: "Running: Helm",

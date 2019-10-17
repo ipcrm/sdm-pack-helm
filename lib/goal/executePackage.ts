@@ -2,8 +2,8 @@ import {Success} from "@atomist/automation-client";
 import {doWithProject, ExecuteGoal, ProjectAwareGoalInvocation} from "@atomist/sdm";
 import * as fs from "fs-extra";
 import * as request from "request-promise-native";
-import {getChartData} from "./chartData";
-import {HelmConfiguration, HelmPackageRegistration} from "./interfaces";
+import {getChartData} from "../support/chartData";
+import {HelmConfiguration, HelmPackageRegistration} from "../support/interfaces";
 
 export function helmPackageExecution(registration: HelmConfiguration & HelmPackageRegistration): ExecuteGoal {
     return doWithProject(async gi => {
